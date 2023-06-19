@@ -31,10 +31,10 @@ def buscar1_produto(conn,busca_name):
     produto = cursor.fetchall()
     print(produto)
 
-def venda_produto(conexao,venda,nick_produto,id_produto,quantidade,valor):
+def venda_produto(conexao,id_produto, id_cliente, quantidade, valor, venda_data):
     cursor = conexao.cursor()
     sql = f'INSERT INTO venda (venda_data,produto_id,clientes_id,venda_qtd,venda_total) VALUES (?,?,?,?,?)'
-    cursor.execute(sql,[venda,nick_produto,id_produto,quantidade,valor])
+    cursor.execute(sql,[venda_data,id_produto,id_cliente,quantidade, valor])
     conexao.commit()
     return True
     

@@ -2,15 +2,28 @@ import sqlite3
 from sys import exit
 from usuario_db import cadastro_usuario, login_usuario
 from produto_db import cadastro_produto, atualizar_produto, deletar_produto, listar_produto, buscar1_produto, venda_produto
+import getpass
+import bcrypt
+
+
 
 conn = sqlite3.connect('sistema_database')
 c = conn.cursor()
 
+def criotpgrafar(password):
+    bytes = password.encode('utf-8')
+    hashed = bcrypt.hashpw(bytes, bcrypt.gensalt(14))
+    return hashed
+
+def checar_password(password, hashed):
+    bytes = password.encode('utf-8')
+    return bcrypt.checkpw(bytes, hashed)
+
 def login():
     email = input('Digite o seu email: ')
-    senha = input('Digite a sua senha: ')
-    usuario_autenticado = login_usuario(conn, email, senha)
-    if usuario_autenticado is not None:
+    senha = getpass.getpass('Digite a sua senha: ')
+    usuario_autenticado = login_usuario(conn, email)
+    if len(usuario_autenticado)> 0 and checar_password(senha, usuario_autenticado[0][2]): 
         print('Autenticado com Sucesso')
         main_interno()
     print(usuario_autenticado is not None)
@@ -77,15 +90,15 @@ def venda():
     c.execute("SELECT produto_preco FROM peças WHERE produto_id=?", (id_produto,))
     result = c.fetchone()
     if result is not None:
-        preco_unitario = result[0]
+        preco_unitario = float(str(result[0]).replace(',', '.'))
+        print(preco_unitario)
         preco_total = quantidade * preco_unitario
-        valor = round(float(preco_total.replace(',', '').replace('.', '')), 2)  # as virgulas convertem o valor em float
         
-        print(f"Preço total da venda: R$ {valor}")
+        print(f"Preço total da venda: R$  %.2f" % (preco_total))
     else:
         print("Erro ao obter preço do produto.")
 
-    venda_produto(conn, id_produto, id_cliente, quantidade, valor, venda_data)
+    venda_produto(conn, id_produto, id_cliente, quantidade, preco_total, venda_data)
     print("Venda registrada com sucesso!")
 
 def main_interno():
@@ -109,10 +122,11 @@ def main_interno():
 def cadastrar_usuario():
     name = input('Digite seu email: ')
     password = input('Digite sua senha: ')
+    password_crpto = criotpgrafar(password)
     endereco = input('Digite seu endereço: ')
     cliente = input('Digite seu nome: ')
     telefone = input('Digite seu telefone: ')
     print('Cadastrado com sucesso!')
-    cadastro_usuario(conn, name, password, endereco, cliente, telefone)
+    cadastro_usuario(conn, name, password_crpto, endereco, cliente, telefone)
 
 main_inicial()
