@@ -1,5 +1,4 @@
 import sqlite3 
-
 conn = sqlite3.connect('sistema_database')
 c = conn.cursor()
 '''Nesse folder esta a conexão da linguagem SQL para a integração do banco de dados 
@@ -20,15 +19,15 @@ conn.commit()
 conn = sqlite3.connect('sistema_database')
 c = conn.cursor()
 c.execute('''
-            CREATE TABLE peças(
-            produto_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            produto_nome VARCHAR(150),
-            produto_qtd VARCHAR (22),
-            produto_marca VARCHAR (150),
-            produto_preco NUMERIC (22)
-            )
+    CREATE TABLE peças (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        produto_nome TEXT,
+        produto_qtde INTEGER,
+        produto_marca TEXT,
+        produto_preco REAL
+    )
+''')
 
-        ''')
 conn.commit()
 conn = sqlite3.connect('sistema_database')
 c = conn.cursor()
